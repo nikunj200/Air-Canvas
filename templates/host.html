@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.25/webcam.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='common.css') }}" />
+    <title>Document</title>
+</head>
+<body>
+    <div class="content">
+        <div class="navbar">
+            <span>Joined As: {{ name }}</span>
+            <span>RoomId: {{ roomId }}</span>
+        </div>
+        <div class="canvas-wrapper">
+            <img id="canvas">
+        </div>
+        <div class="text-box">
+            <div id="texts"></div>
+            <div class="message">
+                <input id="msg" type="text" placeholder="message">
+                <button onclick="handleClick()">&gt;</button>
+            </div>
+        </div>
+        <div id="participants" class="participants">
+        </div>
+        <div id="camera"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script> 
+        const handleClick = () => {
+            const msg = document.getElementById('msg').value;
+            document.getElementById('msg').value = "";
+
+            socket.emit('message', {name, msg, roomId});
+        };
+        const name = '{{ name }}';
+        const roomId = '{{ roomId }}';
+        const socket = io.connect('http://127.0.0.1:5000/');
+        socket.emit('join-room', {name, roomId});
+        socket.on('new-frame', (data) => {
+            const canvas = document.getElementById('canvas');
+            canvas.src = `data:image/jpeg;base64,${data}`;
+        });
+        socket.on('msg', (data) => {
+            const texts = document.getElementById("texts");
+            var elem = document.createElement('span');
+            elem.innerHTML = `${data['name']}<br>${data['msg']}`;
+
+            texts.append(elem);
+            console.log(data);
+        });
+        socket.on('joined', (data) => {
+            const participants = document.getElementById("participants");
+            var elem = document.createElement('span');
+            elem.innerHTML = `${data}`;
+
+            participants.append(elem);
+            console.log(data);
+        });
+        const FPS = 20;
+
+        // CAMERA SETTINGS.
+        Webcam.set({
+            width: 900,
+            height: 720,
+            image_format: 'jpeg',
+            jpeg_quality: 100
+        });
+        Webcam.attach('#camera');
+
+        // SHOW THE SNAPSHOT.
+        const sendSnapShot = () => {
+            Webcam.snap((data_uri) => {
+                socket.emit('capture', {data_uri, roomId});
+            });
+            setTimeout(sendSnapShot, 1000/FPS);
+        }
+        setTimeout(sendSnapShot, 2000);
+    </script>
+</body>
+</html>

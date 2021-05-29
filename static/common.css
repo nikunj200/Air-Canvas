@@ -1,0 +1,47 @@
+body {
+    margin: 0px !important;
+}
+.content {
+    box-sizing: border-box;
+    padding: 10px;
+    padding-top: 0px;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    background-image: url("https://images.pexels.com/photos/129731/pexels-photo-129731.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500");
+    display: grid;
+    grid-template-columns: 20fr 60fr 20fr;
+    grid-template-rows: 7vh 90vh;
+    grid-gap: 10px;
+}
+
+.canvas-wrapper {
+    width: 100%;
+    height: 100%;
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.text-box {
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.participants {
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.navbar {
+    grid-column: 1 / span 3;
+}
+
+#camera {
+    display: none;
+}
